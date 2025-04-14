@@ -1,23 +1,23 @@
-import type { Metadata } from 'next';
-import localFont from 'next/font/local';
-import './globals.css';
-import RecoilContextProvider from '@/const/recoilContextProvider';
+import type { Metadata } from "next";
+import localFont from "next/font/local";
+import "./globals.css";
+import RecoilContextProvider from "@/const/recoilContextProvider";
 
 const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
 });
 const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
 });
 
 export const metadata: Metadata = {
-  title: 'Cozzy Corner',
+  title: "Cozzy Corner",
   description:
-    'Cozzy Corner is your go-to spot for high-quality anime action figures. Discover a curated collection that brings your favorite characters to life!',
+    "Cozzy Corner is your go-to spot for high-quality anime action figures. Discover a curated collection that brings your favorite characters to life!",
 };
 
 export default function RootLayout({
@@ -28,10 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta
+        {/* <meta
           name="google-site-verification"
           content="ZAieS2i8hZk0H2BXoEZDNvcjIq2mQ87ByIIDKMLT4yo"
-        />
+        /> */}
 
         {/* META Ads */}
         {/* Meta Pixel Script */}
@@ -55,7 +55,7 @@ export default function RootLayout({
           <img
             height="1"
             width="1"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=1857192071753864&ev=PageView&noscript=1"
           />
         </noscript>
@@ -81,7 +81,7 @@ export default function RootLayout({
           <img
             height="1"
             width="1"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=598276932721937&ev=PageView&noscript=1"
             alt="Facebook Pixel"
           />
