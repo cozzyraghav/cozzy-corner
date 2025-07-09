@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import Footer from '@/components/footer';
-import NavBar from '@/components/navBar';
-import { Loader2Icon, Search } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import React, { useState } from 'react';
+import Footer from "@/components/footer";
+import NavBar from "@/components/navBar";
+import { convertS3ToImageKit } from "@/helper/imagekit";
+import { Loader2Icon, Search } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useState } from "react";
 
 const Orders = () => {
   return (
@@ -18,16 +19,16 @@ const Orders = () => {
 };
 
 const ShowOrderData = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [orderData, setOrderData] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   async function handleSearchForOrder() {
     setIsLoading(true);
-    const response = await fetch('/api/getOrderDetailsByEmail', {
-      method: 'POST',
+    const response = await fetch("/api/getOrderDetailsByEmail", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
     });
@@ -35,10 +36,10 @@ const ShowOrderData = () => {
       const data = await response.json();
       setOrderData(data);
     } else if (response.status === 404) {
-      setErrorMessage('No order found');
+      setErrorMessage("No order found");
       setOrderData([]);
       setTimeout(() => {
-        setErrorMessage('');
+        setErrorMessage("");
       }, 5000);
     }
 
@@ -132,7 +133,8 @@ function ListSingleProduct({ order, index }: any) {
                 <div className="col-span-1 flex max-w-24 items-center justify-between gap-1">
                   <p>{index + 1}</p>
                   <Image
-                    src={item.image}
+                    // src={}
+                    src={convertS3ToImageKit(item.image)}
                     height={48}
                     width={48}
                     alt=""
@@ -140,8 +142,8 @@ function ListSingleProduct({ order, index }: any) {
                   />
                 </div>
                 <Link
-                  href={'/product/' + item.productId}
-                  target={'_blank'}
+                  href={"/product/" + item.productId}
+                  target={"_blank"}
                   className="col-span-3 break-all hover:underline"
                 >
                   {item.name}
@@ -163,7 +165,7 @@ function ListSingleProduct({ order, index }: any) {
               </div>
               <div className="col-span-3 break-all hover:underline"></div>
               <div className="col-span-1 break-all text-right">
-                {'+ '}
+                {"+ "}
                 {Number(order.discountedPrice).toFixed(2)}
               </div>
               <div className="col-span-1 break-all"></div>
@@ -193,7 +195,7 @@ function ListSingleProduct({ order, index }: any) {
               </div>
               <div className="col-span-2 break-all hover:underline"></div>
               <div className="col-span-1 break-all text-right">
-                {'+ '}
+                {"+ "}
                 {Number(order.extraCharge).toFixed(2)}
               </div>
               <div className="col-span-1 break-all"></div>
@@ -217,7 +219,7 @@ function ListSingleProduct({ order, index }: any) {
               </div>
               <div className="col-span-3 break-all hover:underline"></div>
               <div className="col-span-1 break-all text-right">
-                {''}
+                {""}
                 {(
                   Number(order.discountedPrice) + Number(order.extraCharge)
                 ).toFixed(2)}

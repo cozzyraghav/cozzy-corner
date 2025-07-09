@@ -1,8 +1,9 @@
-'use client';
-import { useCart } from '@/const/cartContext';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
+"use client";
+import { useCart } from "@/const/cartContext";
+import { convertS3ToImageKit } from "@/helper/imagekit";
+import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function ProductCard({
   id,
@@ -44,10 +45,12 @@ export default function ProductCard({
           className="block h-44 w-full rounded-lg bg-white object-contain md:h-52"
         /> */}
         <Image
-          src={images[0]}
+          // src={}
+          src={convertS3ToImageKit(images[0])}
           alt={name}
           className="object-contain"
-          fill={true}
+          width={500}
+          height={500}
         ></Image>
         {outOfStock && (
           <p className="absolute bottom-2 left-1 w-fit rounded-3xl border border-neutral-400 bg-neutral-800 px-2.5 py-1 text-center text-xs font-semibold text-neutral-200">

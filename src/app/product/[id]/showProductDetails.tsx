@@ -1,11 +1,12 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { CartProvider } from '@/const/cartContext';
-import ProductCard from '@/components/productCard';
-import { useRecoilState } from 'recoil';
-import { cartState } from '@/const/cartState';
-import Image from 'next/image';
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { CartProvider } from "@/const/cartContext";
+import ProductCard from "@/components/productCard";
+import { useRecoilState } from "recoil";
+import { cartState } from "@/const/cartState";
+import Image from "next/image";
+import { convertS3ToImageKit } from "@/helper/imagekit";
 const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -35,7 +36,7 @@ const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
     setIsLoading(false);
   }, []);
   useEffect(() => {
-    if (typeof window !== 'undefined' && cart) {
+    if (typeof window !== "undefined" && cart) {
       const parsedCart = cart ? JSON.parse(cart) : [];
       const productInCart = parsedCart.some((item: any) => item.id === id);
       setInCart(productInCart);
@@ -62,7 +63,7 @@ const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
     if (outOfStock) return;
 
     setCart(JSON.stringify([{ id, quantity: 1 }]));
-    router.push('/cart');
+    router.push("/cart");
   };
 
   if (isLoading) {
@@ -84,12 +85,12 @@ const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
               {images?.map((image: string, index: number) => (
                 <Image
                   key={index}
-                  src={image}
+                  src={convertS3ToImageKit(image)}
                   width={164}
                   height={164}
                   alt={`Thumbnail ${index + 1}`}
                   className={`h-16 w-16 cursor-pointer rounded-lg object-cover ${
-                    selectedImage === image ? 'border-4 border-p-green' : ''
+                    selectedImage === image ? "border-4 border-p-green" : ""
                   }`}
                   onClick={() => setSelectedImage(image)}
                 />
@@ -100,8 +101,9 @@ const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
             <div className="relative h-80 w-80 md:h-96 md:w-96">
               {selectedImage && (
                 <Image
-                  src={selectedImage}
-                  fill={true}
+                  src={convertS3ToImageKit(selectedImage)}
+                  width={500}
+                  height={500}
                   alt="Selected Product"
                   className="h-full w-full rounded-lg object-cover shadow-lg"
                 />
@@ -129,19 +131,19 @@ const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
               <div className="flex gap-4">
                 <button
                   onClick={handleBuyNow} // Handle Buy Now click
-                  className={`rounded bg-p-green px-8 py-2 font-semibold text-white transition duration-300 hover:bg-p-green/90 ${outOfStock ? 'cursor-not-allowed opacity-50' : ''}`}
+                  className={`rounded bg-p-green px-8 py-2 font-semibold text-white transition duration-300 hover:bg-p-green/90 ${outOfStock ? "cursor-not-allowed opacity-50" : ""}`}
                 >
                   Buy now
                 </button>
                 <button
                   onClick={toggleCart}
-                  className={`rounded border border-p-blue px-8 py-2 text-white transition duration-300 hover:bg-p-blue/90 ${outOfStock ? 'cursor-not-allowed opacity-50' : ''}`}
+                  className={`rounded border border-p-blue px-8 py-2 text-white transition duration-300 hover:bg-p-blue/90 ${outOfStock ? "cursor-not-allowed opacity-50" : ""}`}
                 >
                   {outOfStock
-                    ? 'Out of stock'
+                    ? "Out of stock"
                     : inCart
-                      ? 'Remove from cart'
-                      : 'Add to cart'}
+                      ? "Remove from cart"
+                      : "Add to cart"}
                 </button>
               </div>
             </div>

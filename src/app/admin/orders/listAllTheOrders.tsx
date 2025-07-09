@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { Trash2 } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { convertS3ToImageKit } from "@/helper/imagekit";
+import { Trash2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 const ListAllTheOrders = ({ orderDataString }: any) => {
   const orderData = JSON.parse(orderDataString);
@@ -53,10 +54,10 @@ function ListSingleProduct({ order, index }: any) {
     setLoading(true);
     const status = e.target.value;
     if (ORDER_OPTIONS.includes(status)) {
-      await fetch('/api/updateOrderState', {
-        method: 'POST',
+      await fetch("/api/updateOrderState", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ id: order._id, status }),
       });
@@ -66,21 +67,21 @@ function ListSingleProduct({ order, index }: any) {
   }
   async function handleOrderDelete(id: string) {
     setLoading(true);
-    await fetch('/api/deleteOrder', {
-      method: 'POST',
+    await fetch("/api/deleteOrder", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ id }),
     });
     setLoading(false);
     router.refresh();
   }
-  const ORDER_OPTIONS = ['pending', 'accepted', 'dispatched', 'delivered'];
+  const ORDER_OPTIONS = ["pending", "accepted", "dispatched", "delivered"];
 
   function ValidateNumber(num: string) {
-    const trimedNumber = num.replace(/\s+/g, '');
-    if (trimedNumber.slice(0, 3) === '+91') {
+    const trimedNumber = num.replace(/\s+/g, "");
+    if (trimedNumber.slice(0, 3) === "+91") {
       return trimedNumber.slice(3);
     } else {
       return trimedNumber;
@@ -91,7 +92,7 @@ function ListSingleProduct({ order, index }: any) {
     <div className="flex flex-col">
       <div
         onClick={() => setShowItems((prev: any) => !prev)}
-        className={`grid cursor-pointer grid-cols-12 gap-2 border bg-gray-100 px-2 py-2 ${order.status === 'pending' && 'bg-red-50'} ${order.status === 'accepted' && 'bg-yellow-50'} ${order.status === 'dispatched' && 'bg-blue-50'} ${order.status === 'delivered' && 'bg-green-50'}`}
+        className={`grid cursor-pointer grid-cols-12 gap-2 border bg-gray-100 px-2 py-2 ${order.status === "pending" && "bg-red-50"} ${order.status === "accepted" && "bg-yellow-50"} ${order.status === "dispatched" && "bg-blue-50"} ${order.status === "delivered" && "bg-green-50"}`}
       >
         <div className="col-span-1 break-all">{index + 1}</div>
         <div className="col-span-2 break-all">{order.name}</div>
@@ -107,7 +108,10 @@ function ListSingleProduct({ order, index }: any) {
             width={28}
             height={28}
             className="cursor-pointer rounded-xl bg-green-700 p-1 duration-200 hover:scale-105"
-            src="https://s3.ap-south-1.amazonaws.com/cozzy.corner/whatsapp-icon.png"
+            // src=
+            src={convertS3ToImageKit(
+              "https://s3.ap-south-1.amazonaws.com/cozzy.corner/whatsapp-icon.png"
+            )}
             alt=""
           />
         </Link>
@@ -116,7 +120,7 @@ function ListSingleProduct({ order, index }: any) {
       {showItems && (
         <div className="flex flex-col border">
           <div
-            className={`flex justify-between gap-6 border-b border-gray-300 px-2 py-2 ${loading && 'pointer-events-none opacity-40'}`}
+            className={`flex justify-between gap-6 border-b border-gray-300 px-2 py-2 ${loading && "pointer-events-none opacity-40"}`}
           >
             <div
               onClick={() => handleOrderDelete(order._id)}
@@ -149,16 +153,18 @@ function ListSingleProduct({ order, index }: any) {
                   <p>{index + 1}</p>
                   <div className="relative size-8 overflow-hidden">
                     <Image
-                      src={item.image}
-                      fill={true}
+                      // src={}
+                      src={convertS3ToImageKit(item.image)}
+                      width={100}
+                      height={100}
                       className="h-full w-full object-contain"
                       alt=""
                     />
                   </div>
                 </div>
                 <Link
-                  href={'/product/' + item.productId}
-                  target={'_blank'}
+                  href={"/product/" + item.productId}
+                  target={"_blank"}
                   className="col-span-3 break-all hover:underline"
                 >
                   {item.name}
@@ -188,7 +194,7 @@ function ListSingleProduct({ order, index }: any) {
               </div>
               <div className="col-span-3 break-all hover:underline"></div>
               <div className="col-span-1 break-all text-right">
-                {'+ '}
+                {"+ "}
                 {Number(order.discountedPrice).toFixed(2)}
               </div>
               <div className="col-span-1 break-all"></div>
@@ -230,7 +236,7 @@ function ListSingleProduct({ order, index }: any) {
               </div>
               <div className="col-span-2 break-all hover:underline"></div>
               <div className="col-span-1 break-all text-right">
-                {'+ '}
+                {"+ "}
                 {Number(order.extraCharge).toFixed(2)}
               </div>
               <div className="col-span-1 break-all"></div>
@@ -255,7 +261,7 @@ function ListSingleProduct({ order, index }: any) {
               </div>
               <div className="col-span-3 break-all hover:underline"></div>
               <div className="col-span-1 break-all text-right">
-                {''}
+                {""}
                 {(
                   Number(order.discountedPrice) + Number(order.extraCharge)
                 ).toFixed(2)}

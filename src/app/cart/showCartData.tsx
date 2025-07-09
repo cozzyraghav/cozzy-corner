@@ -1,11 +1,12 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { Minus, Plus, Trash2 } from 'lucide-react';
-import axios from 'axios';
-import Link from 'next/link';
-import { useRecoilState } from 'recoil';
-import { cartState } from '@/const/cartState';
-import Image from 'next/image';
+"use client";
+import { useState, useEffect } from "react";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import axios from "axios";
+import Link from "next/link";
+import { useRecoilState } from "recoil";
+import { cartState } from "@/const/cartState";
+import Image from "next/image";
+import { convertS3ToImageKit } from "@/helper/imagekit";
 
 declare global {
   interface Window {
@@ -15,8 +16,8 @@ declare global {
 
 const ShowCartData = () => {
   // State about coupon
-  const [couponInput, setCouponInput] = useState('');
-  const [couponMsg, setCouponMsg] = useState('');
+  const [couponInput, setCouponInput] = useState("");
+  const [couponMsg, setCouponMsg] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
 
   const [amountPayableOnline, setAmountPayableOnline] = useState(60);
@@ -28,21 +29,21 @@ const ShowCartData = () => {
   const [loading, setLoading] = useState(true);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [userDetails, setUserDetails] = useState({
-    name: '',
-    email: '',
-    mobile: '',
-    pincode: '',
-    addressLine1: '',
-    addressLine2: '',
-    landmark: '',
-    transactionId: '',
+    name: "",
+    email: "",
+    mobile: "",
+    pincode: "",
+    addressLine1: "",
+    addressLine2: "",
+    landmark: "",
+    transactionId: "",
   });
 
   // code for loading razorpay script
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => resolve(true);
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
@@ -62,7 +63,7 @@ const ShowCartData = () => {
 
       if (productIds.length > 0) {
         try {
-          const response = await axios.post('/api/products', {
+          const response = await axios.post("/api/products", {
             ids: productIds,
           });
           const products = response.data;
@@ -74,7 +75,7 @@ const ShowCartData = () => {
           });
           setCartItems(updatedCartItems);
         } catch (error) {
-          console.error('Error fetching products:', error);
+          console.error("Error fetching products:", error);
         }
       }
       setLoading(false);
@@ -137,7 +138,7 @@ const ShowCartData = () => {
     e.preventDefault();
 
     if (total < 299) {
-      alert('Minimum order amount is ₹299.');
+      alert("Minimum order amount is ₹299.");
       return;
     }
     // Loading raqorpay script before rendring
@@ -145,15 +146,15 @@ const ShowCartData = () => {
     const onlinePaymentAmmount = amountPayableOnline;
     let paymentDetail: PaymentDetails = {
       ammount: onlinePaymentAmmount,
-      orderId: '',
-      status: '',
+      orderId: "",
+      status: "",
     };
     try {
       // Create an order by calling your backend
-      const response = await fetch('/api/create-order-razorpay', {
-        method: 'POST',
+      const response = await fetch("/api/create-order-razorpay", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ onlinePaymentAmmount }),
       });
@@ -162,16 +163,16 @@ const ShowCartData = () => {
       const options = {
         key: process.env.NEXT_PUBLIC_KEY_ID,
         amount: onlinePaymentAmmount * 100,
-        currency: 'INR',
-        name: 'Cozzy Corner',
-        description: 'Test Transaction',
+        currency: "INR",
+        name: "Cozzy Corner",
+        description: "Test Transaction",
         order_id: data.orderId,
         handler: async function (response: any) {
           try {
-            const verifyResponse = await fetch('/api/verify-payment', {
-              method: 'POST',
+            const verifyResponse = await fetch("/api/verify-payment", {
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -181,22 +182,22 @@ const ShowCartData = () => {
             });
 
             const verifyData = await verifyResponse.json();
-            if (verifyData.status === 'success') {
-              paymentDetail.status = 'success';
+            if (verifyData.status === "success") {
+              paymentDetail.status = "success";
               // Placing the order after successful payment
               handleOrderSubmit(paymentDetail);
             } else {
-              paymentDetail.status = 'failure';
+              paymentDetail.status = "failure";
             }
           } catch (error) {
-            console.error('Verification Error:', error);
-            paymentDetail.status = 'verificationError';
+            console.error("Verification Error:", error);
+            paymentDetail.status = "verificationError";
           }
         },
         modal: {
           ondismiss: function () {
-            console.log('Payment cancelled');
-            paymentDetail.status = 'cancelled';
+            console.log("Payment cancelled");
+            paymentDetail.status = "cancelled";
           },
         },
       };
@@ -204,8 +205,8 @@ const ShowCartData = () => {
       const rzpay = new window.Razorpay(options);
       rzpay.open();
     } catch (error) {
-      console.error('Payment Error:', error);
-      paymentDetail.status = 'paymentError';
+      console.error("Payment Error:", error);
+      paymentDetail.status = "paymentError";
     }
     // console.log('payment detail is: ' + JSON.stringify(paymentDetail));
   }
@@ -229,51 +230,51 @@ const ShowCartData = () => {
     };
 
     try {
-      const response = await fetch('/api/order', {
-        method: 'POST',
+      const response = await fetch("/api/order", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(orderData),
       });
 
       if (response.ok) {
-        scrollTo({ top: 0, behavior: 'smooth' });
-        setCart('');
+        scrollTo({ top: 0, behavior: "smooth" });
+        setCart("");
         setCartItems([]);
         setUserDetails({
-          name: '',
-          email: '',
-          mobile: '',
-          pincode: '',
-          addressLine1: '',
-          addressLine2: '',
-          landmark: '',
-          transactionId: '',
+          name: "",
+          email: "",
+          mobile: "",
+          pincode: "",
+          addressLine1: "",
+          addressLine2: "",
+          landmark: "",
+          transactionId: "",
         });
         setAmountPayableOnline(60);
         setIsCOD(false);
         setShowCheckoutForm(false);
         setIsOrderPlaced(true);
       } else {
-        alert('Failed to place order. Please try again.');
+        alert("Failed to place order. Please try again.");
       }
     } catch (error) {
-      console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      console.error("Error placing order:", error);
+      alert("Failed to place order. Please try again.");
     }
   }
 
   function handleCouponApply(value: any) {
-    if (value === 'AAY10') {
+    if (value === "AAY10") {
       if (total < 2000) {
-        setCouponMsg('Minimum order amount for coupon is ₹2000');
+        setCouponMsg("Minimum order amount for coupon is ₹2000");
         return;
       }
-      setCouponMsg('10% Discount Applied');
+      setCouponMsg("10% Discount Applied");
       setCouponApplied(true);
     } else {
-      setCouponMsg('Invalid Coupon');
+      setCouponMsg("Invalid Coupon");
     }
   }
 
@@ -332,9 +333,11 @@ const ShowCartData = () => {
                   <div className="col-span-1 flex w-full flex-col gap-3 md:flex-row md:items-center md:space-x-4">
                     <div className="relative size-16 shrink-0 overflow-hidden rounded-lg md:size-20">
                       <Image
-                        src={item.images[0]}
+                        // src={}
+                        src={convertS3ToImageKit(item.images[0])}
                         alt={item.name}
-                        fill={true}
+                        height={100}
+                        width={100}
                         className="rounded object-cover"
                       />
                     </div>
@@ -627,7 +630,7 @@ function PaymentMethod({
         <div className="">
           <p className="text-green-500">Pay Rs.60 (COD charge) online.</p>
           <p>
-            Amount to be payable on delivery is -{' '}
+            Amount to be payable on delivery is -{" "}
             {couponApplied ? (total - 60 - total / 10).toFixed(2) : total - 60}
           </p>
         </div>
@@ -635,7 +638,7 @@ function PaymentMethod({
         <div className="">
           <p className="text-green-500">
             Pay Rs. {couponApplied ? (total - total / 10).toFixed(2) : total}
-            online {total < 1999 && '(Including Rs.60 of delivery charges)'}
+            online {total < 1999 && "(Including Rs.60 of delivery charges)"}
           </p>
         </div>
         // ) : (

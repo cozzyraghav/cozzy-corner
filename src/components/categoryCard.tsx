@@ -1,6 +1,7 @@
-import { ArrowRight } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { convertS3ToImageKit } from "@/helper/imagekit";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function CategoryCard({ category }: any) {
   return (
@@ -21,12 +22,12 @@ export default function CategoryCard({ category }: any) {
         ></Image> */}
 
         <Image
-          src={category.image}
+          // src={}
+          src={convertS3ToImageKit(category.image)}
           alt={category.name}
-          // width={500}
-          // height={500}
-          className="object-cover"
-          fill={true}
+          width={500}
+          height={500}
+          className="object-cover w-full h-full"
         ></Image>
       </div>
       <div className="flex items-center gap-2 px-2 text-xl font-semibold text-white duration-200 group-hover:gap-4">

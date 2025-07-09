@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { Blocks, EllipsisVertical, Flame, Pencil, Trash2 } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { convertS3ToImageKit } from "@/helper/imagekit";
+import { Blocks, EllipsisVertical, Flame, Pencil, Trash2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 const ListAllProducts = ({ productData }: any) => {
   const [showProducts, setShowProducts] = useState(true);
@@ -12,10 +13,10 @@ const ListAllProducts = ({ productData }: any) => {
   const router = useRouter();
 
   async function handleOutOfStock(id: any) {
-    const data = await fetch('/api/outOfStock', {
-      method: 'POST',
+    const data = await fetch("/api/outOfStock", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ id }),
     });
@@ -25,10 +26,10 @@ const ListAllProducts = ({ productData }: any) => {
     }
   }
   async function handleHotDealProduct(id: any) {
-    const data = await fetch('/api/hotDeal', {
-      method: 'POST',
+    const data = await fetch("/api/hotDeal", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ id }),
     });
@@ -39,10 +40,10 @@ const ListAllProducts = ({ productData }: any) => {
   }
 
   async function handleDelete(id: any) {
-    const data = await fetch('/api/deleteProduct', {
-      method: 'POST',
+    const data = await fetch("/api/deleteProduct", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ id }),
     });
@@ -80,14 +81,16 @@ const ListAllProducts = ({ productData }: any) => {
           {products.map((product: any, index: number) => {
             return (
               <div
-                className={`grid grid-cols-10 gap-2 border px-2 py-1 ${product?.outOfStock && 'bg-red-300'} `}
+                className={`grid grid-cols-10 gap-2 border px-2 py-1 ${product?.outOfStock && "bg-red-300"} `}
               >
                 <div className="col-span-1 flex items-center justify-between gap-1">
                   <p>{index + 1}</p>
                   <div className="relative size-12 overflow-hidden">
                     <Image
-                      fill={true}
-                      src={product.images[0]}
+                      height={100}
+                      width={100}
+                      // src={}
+                      src={convertS3ToImageKit(product.images[0])}
                       className="h-full w-full object-contain"
                       alt=""
                     />
@@ -119,7 +122,7 @@ const ListAllProducts = ({ productData }: any) => {
                   />
                   <Flame
                     onClick={() => handleHotDealProduct(product.id)}
-                    className={`cursor-pointer text-gray-600 duration-200 hover:scale-110 hover:text-gray-800 ${product.isHotDeal && 'fill-red-500 stroke-red-700'}`}
+                    className={`cursor-pointer text-gray-600 duration-200 hover:scale-110 hover:text-gray-800 ${product.isHotDeal && "fill-red-500 stroke-red-700"}`}
                     size={20}
                   />
                 </p>
