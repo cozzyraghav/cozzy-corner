@@ -641,14 +641,6 @@ function PaymentMethod({
             online {total < 1999 && "(Including Rs.60 of delivery charges)"}
           </p>
         </div>
-        // ) : (
-        //   <div className="">
-        //     <p className="text-green-500">
-        //       Pay Rs.{' '}
-        //       {couponApplied ? (total - total / 10).toFixed(2) + 50 : total + 50}
-        //       online {total < 1999 && '(+50 Delivery charge)'}
-        //     </p>
-        //   </div>
       )}
     </div>
   );

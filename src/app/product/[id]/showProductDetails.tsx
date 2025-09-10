@@ -7,10 +7,10 @@ import { useRecoilState } from "recoil";
 import { cartState } from "@/const/cartState";
 import Image from "next/image";
 import { convertS3ToImageKit } from "@/helper/imagekit";
+import { useStore } from "@/helper/store/zustand";
 const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [inCart, setInCart] = useState(false);
   const [cart, setCart] = useRecoilState(cartState);
   const router = useRouter();
   const parsedProductData = productData ? JSON.parse(productData) : {};
@@ -29,34 +29,35 @@ const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
     id,
   } = parsedProductData;
 
+  const { addItemToStore, removeItemFromStore, productStore } = useStore();
+
+  const alreadyInCart = productStore.some((item) => item.id === id);
+
+  const [inCart, setInCart] = useState(alreadyInCart);
+
   useEffect(() => {
     if (images && images.length > 0) {
       setSelectedImage(images[0]);
     }
     setIsLoading(false);
   }, []);
-  useEffect(() => {
-    if (typeof window !== "undefined" && cart) {
-      const parsedCart = cart ? JSON.parse(cart) : [];
-      const productInCart = parsedCart.some((item: any) => item.id === id);
-      setInCart(productInCart);
-    }
-  }, [id, cart]);
 
   const toggleCart = () => {
     if (outOfStock) return;
 
-    let parsedCart = cart ? JSON.parse(cart) : [];
-    const alreadyInCart = parsedCart.some((item: any) => item.id === id);
-
     if (alreadyInCart) {
-      parsedCart = parsedCart.filter((item: any) => item.id !== id);
+      removeItemFromStore(id);
       setInCart(false);
     } else {
-      parsedCart.push({ id, quantity: 1 });
+      addItemToStore({
+        id: parsedProductData.id,
+        image: parsedProductData?.images?.[0],
+        name: parsedProductData.name,
+        price: parsedProductData.discountPrice,
+        quantity: 1,
+      });
       setInCart(true);
     }
-    setCart(JSON.stringify(parsedCart));
   };
 
   const handleBuyNow = () => {
@@ -80,7 +81,7 @@ const ShowProductDetail = ({ productData, similarProductsStringify }: any) => {
         <div className="container mx-auto flex flex-col items-start gap-8 md:flex-row">
           {/* Sticky Image Section */}
           <div className="top-16 flex w-full flex-col-reverse items-center gap-4 p-4 md:sticky md:w-auto md:flex-row">
-            <div className="flex flex-row items-center gap-2 md:flex-col">
+            <div className="flex flex-row overflow-x-auto items-center gap-2 md:flex-col">
               {/* Thumbnails Section */}
               {images?.map((image: string, index: number) => (
                 <Image

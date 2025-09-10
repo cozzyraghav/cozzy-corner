@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { categoryData } from '@/const/products';
-import { Facebook, Github, Globe, Instagram, Youtube } from 'lucide-react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { categoryData } from "@/const/products";
+import { Facebook, Github, Globe, Instagram, Youtube } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -26,14 +26,14 @@ export default function Footer() {
             Get Early Stock Notifications!
           </p>
           <p className="text-base text-gray-400">
-            Join our Instagram page to get early stock updates.{' '}
+            Join our Instagram page to get early stock updates.{" "}
             <Link
               target="_blank"
               href="https://www.instagram.com/cozzy___corner/"
               className="text-blue-600 underline"
             >
               Click Here
-            </Link>{' '}
+            </Link>{" "}
             to join
           </p>
         </div>
@@ -69,38 +69,50 @@ export default function Footer() {
                 Home
               </Link>
               <Link
-                href={'/about-us'}
+                href={"/about-us"}
                 className="cursor-pointer text-gray-400 hover:underline"
               >
                 About Us
               </Link>
               <Link
-                href={'/contact-us'}
+                href={"/contact-us"}
                 className="cursor-pointer text-gray-400 hover:underline"
               >
                 Contact Us
               </Link>
               <Link
-                href={'/orders'}
+                href={"/orders"}
                 className="cursor-pointer text-gray-400 hover:underline"
               >
                 My orders
+              </Link>
+              <Link
+                href={"/user-reviews"}
+                className="cursor-pointer text-gray-400 hover:underline"
+              >
+                View All Reviews
+              </Link>
+              <Link
+                href={"/review"}
+                className="cursor-pointer text-gray-400 hover:underline"
+              >
+                Add Reviews
               </Link>
             </div>
           </div>
         </div>
       </div>
       <div className="mx-auto flex w-fit gap-4">
-        <Link href={'https://www.instagram.com/cozzy___corner/'}>
+        <Link href={"https://www.instagram.com/cozzy___corner/"}>
           <Instagram className="h-6 w-6 cursor-pointer text-gray-200 duration-200 hover:scale-105" />
         </Link>
         <Link
-          target={'_blank'}
+          target={"_blank"}
           href={
-            'https://wa.me/+919664203951?text=Hi Cozzy Corner, I am interested in your product'
+            "https://wa.me/+919664203951?text=Hi Cozzy Corner, I am interested in your product"
           }
         >
-          {' '}
+          {" "}
           <img
             src="https://s3.ap-south-1.amazonaws.com/cozzy.corner/whatsapp-icon.png"
             className="h-6 w-6 cursor-pointer hover:scale-105"
@@ -108,7 +120,7 @@ export default function Footer() {
           />
         </Link>
         <Link
-          href={'https://youtube.com/@cozzy___corner82?si=uoTtdLMErC0HzVn2'}
+          href={"https://youtube.com/@cozzy___corner82?si=uoTtdLMErC0HzVn2"}
         >
           <Youtube className="h-6 w-6 cursor-pointer text-gray-200 duration-200 hover:scale-105" />
         </Link>
@@ -135,12 +147,12 @@ function AshishFooter() {
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   function handleNameClick() {
-    router.push('https://portfolio-iota-olive-12.vercel.app/');
+    router.push("https://portfolio-iota-olive-12.vercel.app/");
   }
   return (
     <div className="mx-auto w-full border-t border-neutral-600 py-2">
       <div className="relative text-center text-sm text-gray-300">
-        Developed By -{' '}
+        Developed By -{" "}
         <span
           onClick={handleNameClick}
           className="cursor-pointer rounded p-1 duration-300 hover:bg-neutral-700"
@@ -150,8 +162,8 @@ function AshishFooter() {
           Ashish Bishnoi
           {isHovered && (
             <motion.div
-              whileInView={{ opacity: 1, y: 0, x: '-50%' }}
-              initial={{ opacity: 0, y: 6, x: '-50%' }}
+              whileInView={{ opacity: 1, y: 0, x: "-50%" }}
+              initial={{ opacity: 0, y: 6, x: "-50%" }}
               transition={{ duration: 0.3 }}
               className="absolute bottom-6 left-1/2 -translate-x-1/2 transform p-1"
             >
@@ -159,7 +171,7 @@ function AshishFooter() {
                 <div className="flex gap-3">
                   <Link
                     target="_blank"
-                    href={'https://portfolio-iota-olive-12.vercel.app/'}
+                    href={"https://portfolio-iota-olive-12.vercel.app/"}
                   >
                     <motion.img
                       whileHover={{ scale: 1.05 }}
@@ -192,7 +204,7 @@ function AshishFooter() {
                     </Link>
                     <Link
                       target="_blank"
-                      href={'https://github.com/ashish11011'}
+                      href={"https://github.com/ashish11011"}
                     >
                       <Github
                         className="cursor-pointer text-gray-200 duration-200 hover:scale-125 hover:text-white"

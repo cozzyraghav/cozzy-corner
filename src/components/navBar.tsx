@@ -1,5 +1,5 @@
-'use client';
-import { cartState } from '@/const/cartState';
+"use client";
+import { cartState } from "@/const/cartState";
 import {
   ChevronDown,
   ChevronUp,
@@ -7,42 +7,43 @@ import {
   Search,
   ShoppingBag,
   X,
-} from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
-import { useRecoilState } from 'recoil';
+} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { useRecoilState } from "recoil";
+import { CartSheet } from "./cartSheet";
 
 const NavBar = () => {
   const [mobNavOpen, setMobNavOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
 
   const navData = [
-    { name: 'Home', slug: '/' },
+    { name: "Home", slug: "/" },
     {
-      name: 'Category',
+      name: "Category",
       subMenu: [
-        { name: 'Action Figure', slug: '/category/action-figure' },
-        { name: 'Miniature', slug: '/category/miniature' },
-        { name: 'Bobble Head', slug: '/category/bobble-head' },
-        { name: 'Sets', slug: '/category/sets' },
-        { name: 'Q Posket', slug: '/category/q-posket' },
-        { name: 'Keychain', slug: '/category/keychain' },
-        { name: 'Katana', slug: '/category/katana' },
+        { name: "Action Figure", slug: "/category/action-figure" },
+        { name: "Miniature", slug: "/category/miniature" },
+        { name: "Bobble Head", slug: "/category/bobble-head" },
+        { name: "Sets", slug: "/category/sets" },
+        { name: "Q Posket", slug: "/category/q-posket" },
+        { name: "Keychain", slug: "/category/keychain" },
+        { name: "Katana", slug: "/category/katana" },
       ],
     },
     {
-      name: 'Series',
+      name: "Series",
       subMenu: [
-        { name: 'Naruto', slug: '/series/naruto' },
-        { name: 'One Piece', slug: '/series/one-piece' },
-        { name: 'Demon Slayer', slug: '/series/demon-slayer' },
-        { name: 'Dragon Ball Z', slug: '/series/dragon-ball-z' },
-        { name: 'Marvel', slug: '/series/marvel' },
-        { name: 'Jujutsu Kaisen', slug: '/series/jujutsu-kaisen' },
-        { name: 'Others', slug: '/series/others' },
+        { name: "Naruto", slug: "/series/naruto" },
+        { name: "One Piece", slug: "/series/one-piece" },
+        { name: "Demon Slayer", slug: "/series/demon-slayer" },
+        { name: "Dragon Ball Z", slug: "/series/dragon-ball-z" },
+        { name: "Marvel", slug: "/series/marvel" },
+        { name: "Jujutsu Kaisen", slug: "/series/jujutsu-kaisen" },
+        { name: "Others", slug: "/series/others" },
       ],
     },
-    { name: 'Your orders', slug: '/orders' },
+    { name: "Your orders", slug: "/orders" },
   ];
 
   return (
@@ -55,7 +56,7 @@ const NavBar = () => {
       </div>
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-8 px-4 py-6 md:px-8 md:py-6">
         <Link
-          href={'/'}
+          href={"/"}
           className="flex h-10 w-36 min-w-14 items-start justify-start"
         >
           <img
@@ -83,7 +84,7 @@ const NavBar = () => {
             })}
             <li className="flex cursor-pointer items-center justify-center px-2 py-1.5 text-sm duration-300 hover:bg-neutral-800 md:px-3 md:text-base">
               <Link
-                href={'/searchproduct'}
+                href={"/searchproduct"}
                 // className="cursor-pointer px-2 py-1.5 text-sm duration-300 hover:bg-neutral-800 md:px-3 md:text-base"
               >
                 <Search />
@@ -98,7 +99,7 @@ const NavBar = () => {
         {/* Mobile Navigation */}
         <div className="flex items-center gap-2 md:hidden">
           <Link
-            href={'/searchproduct'}
+            href={"/searchproduct"}
             className="cursor-pointer px-2 py-1.5 text-sm duration-300 md:px-5 md:text-base"
           >
             <Search color="#ccc" />
@@ -207,22 +208,5 @@ function NavSubMenu({ item }: any) {
 }
 
 function CartButton() {
-  const [cart] = useRecoilState(cartState);
-  var cartQuentity = cart
-    ? JSON.parse(cart).reduce(
-        (total: number, item: any) => total + item.quantity,
-        0
-      )
-    : 0;
-  return (
-    <Link
-      href={'/cart'}
-      className="relative cursor-pointer px-2 py-1.5 text-sm duration-300 hover:bg-neutral-800 md:px-3 md:text-base"
-    >
-      <ShoppingBag color="#ccc" />
-      <span className="absolute -top-2 right-0 z-10 text-white">
-        {cartQuentity}
-      </span>
-    </Link>
-  );
+  return <CartSheet />;
 }

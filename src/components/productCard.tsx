@@ -38,7 +38,7 @@ export default function ProductCard({
       href={`/product/${id}`}
       className={`max-w-56 shrink-0 transform rounded-lg border border-gray-600 bg-neutral-950 p-2 shadow-lg transition-transform duration-300 hover:cursor-pointer md:max-w-none md:p-3`}
     >
-      <div className="relative block h-44 w-full rounded-lg bg-white md:h-52">
+      <div className="relative block overflow-hidden w-full rounded-lg bg-white ">
         {/* <img
           src={}
           alt={name}
@@ -48,7 +48,7 @@ export default function ProductCard({
           // src={}
           src={convertS3ToImageKit(images[0])}
           alt={name}
-          className="object-contain"
+          className="object-contain h-auto w-full"
           width={500}
           height={500}
         ></Image>

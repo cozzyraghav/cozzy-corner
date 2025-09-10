@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import Razorpay from 'razorpay';
+import { NextRequest, NextResponse } from "next/server";
+import Razorpay from "razorpay";
 
 const newRazorpay = new Razorpay({
   key_id: process.env.RAZERPAY_KEY_ID as string,
@@ -10,10 +10,11 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   // console.log('body', body);
   const amount = body.onlinePaymentAmmount;
+  console.log("amount", amount);
   try {
     const order = await newRazorpay.orders.create({
       amount: amount * 100,
-      currency: 'INR',
+      currency: "INR",
       receipt: `receipt_${Math.random().toString(36).substring(7)}`,
     });
 
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { message: 'Something went wrong' },
+      { message: "Something went wrong" },
       { status: 500 }
     );
   }

@@ -1,11 +1,11 @@
-import ShowProductDetail from './showProductDetails';
-import NavBar from '@/components/navBar';
-import Footer from '@/components/footer';
-import connect from '@/dbConfig/dbConfig';
-import Product from '@/Models/productModel';
-import { CartProvider } from '@/const/cartContext';
-import BottomInstagram from '@/components/bottomInstagram';
-import { Metadata } from 'next';
+import ShowProductDetail from "./showProductDetails";
+import NavBar from "@/components/navBar";
+import Footer from "@/components/footer";
+import connect from "@/dbConfig/dbConfig";
+import Product from "@/Models/productModel";
+import { CartProvider } from "@/const/cartContext";
+import BottomInstagram from "@/components/bottomInstagram";
+import { Metadata } from "next";
 
 async function fetchProductData(id: string) {
   await connect();
@@ -37,12 +37,10 @@ const SingleCardPage = async (context: any) => {
       <BottomInstagram />
       <NavBar />
       {productData && (
-        <CartProvider>
-          <ShowProductDetail
-            similarProductsStringify={JSON.stringify(similarProducts)}
-            productData={JSON.stringify(productData)}
-          />
-        </CartProvider>
+        <ShowProductDetail
+          similarProductsStringify={JSON.stringify(similarProducts)}
+          productData={JSON.stringify(productData)}
+        />
       )}
       <Footer />
     </div>
