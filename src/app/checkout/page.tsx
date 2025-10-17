@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { convertS3ToImageKit } from "@/helper/imagekit";
 import { useStore } from "@/helper/store/zustand";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
@@ -26,11 +27,105 @@ declare global {
 const Page = () => {
   const { productStore, emptyCart } = useStore();
 
+  const GIFT_WRAP_CHARGES = 40;
+  const [isGiftWrap, setIsGiftWrap] = useState(false);
+
+  const [appliedCoupon, setAppliedCoupon] = useState("");
+  const [couponError, setCouponError] = useState("");
+  const cartTotal = productStore.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+
+  const applyCoupon = (code: string) => {
+    const coupon = COUPONS.find((c) => c.code === code.toUpperCase());
+    if (!coupon) {
+      setCouponError("Invalid coupon code.");
+      setAppliedCoupon("");
+      return;
+    }
+
+    if (cartTotal < coupon.minAmount) {
+      setCouponError(
+        `Minimum cart amount of ₹${coupon.minAmount} required for ${code}`
+      );
+      setAppliedCoupon("");
+      return;
+    }
+
+    setCouponError("");
+    setAppliedCoupon(code.toUpperCase());
+  };
+
+  const getDiscountedTotal = () => {
+    const coupon = COUPONS.find((c) => c.code === appliedCoupon);
+    const discount = coupon ? (cartTotal * coupon.discountPercent) / 100 : 0;
+    return discount;
+  };
+
+  function getUserTotalToPay() {
+    console.log(getDiscountedTotal());
+    const finalAmount = isCOD
+      ? cod_charge.extraFees +
+        (cod_charge.depositPercentage / 100) *
+          (cartTotal - getDiscountedTotal())
+      : cartTotal - getDiscountedTotal();
+
+    return (
+      finalAmount +
+      getGiftWrapCharges() +
+      getDeliveryCharges() +
+      getTaxes()
+    ).toFixed(2);
+  }
+
+  function getCartTotal() {
+    return cartTotal;
+  }
+
+  function getTaxes() {
+    return 0;
+  }
+
+  function getDeliveryCharges() {
+    return getDiscountedTotal() >= MINIMUM_AMOUNT_FOR_FREE_DELIVERY
+      ? 0
+      : DELIVERY_CHARGES;
+  }
+
+  function getGiftWrapCharges() {
+    return isGiftWrap ? GIFT_WRAP_CHARGES : 0;
+  }
+
+  const [isCOD, setIsCOD] = useState(false);
+
+  function getUserTotalToPayonDelivery() {
+    const amount = isCOD
+      ? ((100 - cod_charge.depositPercentage) / 100) *
+        (cartTotal - getDiscountedTotal())
+      : 0;
+    return amount.toFixed(2);
+  }
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+
   const [couponInput, setCouponInput] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
 
-  const [isCOD, setIsCOD] = useState(true); // True because the amountPayableOnline is 50 by default
-  const [isGiftWrap, setIsGiftWrap] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   // const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -61,43 +156,8 @@ const Page = () => {
     loadRazorpayScript();
   }, []);
 
-  const cartTotal = productStore.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-  const [appliedCoupon, setAppliedCoupon] = useState("");
-  const [couponError, setCouponError] = useState("");
-
-  const applyCoupon = (code: string) => {
-    const coupon = coupons.find((c) => c.code === code.toUpperCase());
-    if (!coupon) {
-      setCouponError("Invalid coupon code.");
-      setAppliedCoupon("");
-      return;
-    }
-
-    if (cartTotal < coupon.minAmount) {
-      setCouponError(
-        `Minimum cart amount of ₹${coupon.minAmount} required for ${code}`
-      );
-      setAppliedCoupon("");
-      return;
-    }
-
-    setCouponError("");
-    setAppliedCoupon(code.toUpperCase());
-  };
-
-  const getDiscountedTotal = () => {
-    const coupon = coupons.find((c) => c.code === appliedCoupon);
-    const discount = coupon ? (cartTotal * coupon.discountPercent) / 100 : 0;
-    return cartTotal - discount;
-  };
-
-  const discountedTotal = getDiscountedTotal();
-
-  const deliveryCharge = discountedTotal >= delivery_free_above ? 0 : 60;
-  const finalTotal = discountedTotal + deliveryCharge + (isGiftWrap ? 40 : 0);
+  const finalTotal =
+    getDiscountedTotal() + getDeliveryCharges() + (isGiftWrap ? 40 : 0);
 
   interface PaymentDetails {
     ammount: number;
@@ -120,15 +180,14 @@ const Page = () => {
     //   return;
     // }
 
-    if (finalTotal < 299) {
-      alert("Minimum order amount is ₹299.");
-      return;
-    }
+    // if (finalTotal < 299) {
+    //   alert("Minimum order amount is ₹299.");
+    //   return;
+    // }
     // Loading raqorpay script before rendring
     await loadRazorpayScript();
 
-    const onlinePaymentAmmount =
-      (cod_charge.depositPercentage * finalTotal) / 100 + cod_charge.extraFees;
+    const onlinePaymentAmmount = Number(getUserTotalToPay());
 
     let paymentDetail: PaymentDetails = {
       ammount: onlinePaymentAmmount,
@@ -157,6 +216,7 @@ const Page = () => {
         order_id: data.orderId,
         handler: async function (response: any) {
           try {
+            console.log("inside handler", response);
             const verifyResponse = await fetch("/api/verify-payment", {
               method: "POST",
               headers: {
@@ -170,6 +230,7 @@ const Page = () => {
             });
 
             const verifyData = await verifyResponse.json();
+            console.log("verifyData", verifyData);
 
             if (verifyData.status === "success") {
               paymentDetail.status = "success";
@@ -197,10 +258,10 @@ const Page = () => {
       console.error("Payment Error:", error);
       paymentDetail.status = "paymentError";
     }
-    // console.log('payment detail is: ' + JSON.stringify(paymentDetail));
   }
 
   async function handleOrderSubmit(paymentDetail: PaymentDetails) {
+    console.log("paymentDetails: ", paymentDetail);
     const orderData = {
       user: {
         ...userDetails,
@@ -208,9 +269,14 @@ const Page = () => {
           `${userDetails.addressLine1}, ${userDetails.addressLine2}, ${userDetails.landmark}`.trim(),
       },
       items: productStore || [],
-      total: finalTotal,
-      isCOD,
-      isGiftWrap,
+      extraCharge: isCOD ? cod_charge.extraFees : 0,
+      discountedPrice: getDiscountedTotal(),
+      totalAmount: getUserTotalToPay(),
+      isGiftWrap: isGiftWrap,
+      isCOD: isCOD,
+      // total: finalTotal,
+      // isCOD,
+      // isGiftWrap,
       couponApplied,
       couponInput,
       paymentStatus: paymentDetail.status,
@@ -254,9 +320,9 @@ const Page = () => {
 
   return (
     <div className=" text-white  flex min-h-screen w-full flex-col bg-black">
-      <NavBar />
-      <div className=" max-w-7xl grid grid-cols-2 divide-x divide-neutral-500 px-6 py-12  mx-auto w-full">
-        <div className=" px-4">
+      <NavBar offCart={true} />
+      <div className=" max-w-7xl grid grid-cols-1 md:grid-cols-2  md:divide-x divide-neutral-500 px-6 py-12  mx-auto w-full">
+        <div className=" px-4 order-1 md:order-first">
           <div className="flex items-center gap-3">
             <Checkbox
               checked={isGiftWrap}
@@ -274,7 +340,7 @@ const Page = () => {
           <div className=" mt-4">
             <Label>Available Coupons</Label>
             <ul className=" mt-4 space-y-2">
-              {coupons.map((coupon) => (
+              {COUPONS.map((coupon) => (
                 <li
                   key={coupon.code}
                   className=" flex items-center justify-between gap-4"
@@ -380,46 +446,40 @@ const Page = () => {
           </div>
           <Separator className=" my-4" />
           <p className=" font-semibold text-lg">Payment Method</p>
-          <RadioGroup
-            className=" grid grid-cols-2 w-full gap-2"
-            defaultValue="cod"
-            onValueChange={(val) => setIsCOD(val === "cod")}
-          >
-            <Label
-              htmlFor="r1"
-              className="hover:bg-accent/50 border border-gray-700 flex items-start gap-3 rounded has-[[aria-checked=true]]:border p-3  has-[[aria-checked=true]]:border-green-300 has-[[aria-checked=true]]:bg-green-700/30 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950"
+
+          <div className=" flex w-full gap-3 text-center mt-1">
+            <p
+              onClick={() => setIsCOD(true)}
+              className={cn(
+                " w-full border p-2 rounded-md  cursor-pointer",
+                isCOD &&
+                  "border-green-500 border-2 text-green-500 bg-green-600/20"
+              )}
             >
-              <RadioGroupItem
-                className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 border border-gray-100 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                value="cod"
-                onChange={(e) => console.log(e)}
-                id="r1"
-              />
-              <div>Cash on Delivery</div>
-            </Label>
-            <Label
-              htmlFor="r2"
-              className="hover:bg-accent/50 border border-gray-700 flex items-start gap-3 rounded has-[[aria-checked=true]]:border p-3  has-[[aria-checked=true]]:border-green-300 has-[[aria-checked=true]]:bg-green-700/30 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950"
+              Cash on Delivery
+            </p>
+            <p
+              onClick={() => setIsCOD(false)}
+              className={cn(
+                " w-full border p-2 rounded-md ",
+                !isCOD &&
+                  "border-green-500 border-2 text-green-500 bg-green-600/20"
+              )}
             >
-              <RadioGroupItem
-                className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600  border border-gray-100 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                value="online"
-                id="r2"
-              />
-              <div>Online</div>
-            </Label>
-          </RadioGroup>
+              Pay online
+            </p>
+          </div>
 
           <p className=" mt-2">
             {isCOD
-              ? `${cod_charge.depositPercentage}% Booking deposit and remaining cash on delivery (NOTE: Rs. ${cod_charge.extraFees} Extra Fees)`
-              : `No extra COD charges (Rs.${cod_charge.extraFees} Booking deposit)`}
+              ? `${cod_charge.depositPercentage}% Booking deposit and remaining cash on delivery (NOTE: Rs. ${cod_charge.extraFees} Extra Fees for COD)`
+              : ``}
           </p>
           <Button
             onClick={handlePlaceOrder}
             className=" w-full py-3 mt-3 bg-green-500 hover:bg-green-600"
           >
-            Place Order
+            Pay ₹{getUserTotalToPay()}
           </Button>
         </div>
         <div>
@@ -461,30 +521,38 @@ const Page = () => {
                   <TableRow className=" hover:bg-neutral-900">
                     <TableHead>Cart Total</TableHead>
                     <TableCell className=" text-right w-52 text-lg">
-                      ₹ {cartTotal}
+                      ₹ {getCartTotal()}
                     </TableCell>
                   </TableRow>
                   <TableRow className=" hover:bg-neutral-900">
                     <TableHead>Taxes</TableHead>
                     <TableCell className="text-right w-52  text-base">
-                      <p> 0</p>
+                      <p>{getTaxes()}</p>
                     </TableCell>
                   </TableRow>
 
                   <TableRow className=" hover:bg-neutral-900">
                     <TableHead>
                       Delivery Charges(Free for orders above Rs.
-                      {delivery_free_above})
+                      {MINIMUM_AMOUNT_FOR_FREE_DELIVERY})
                     </TableHead>
                     <TableCell className="text-right w-52  text-base">
-                      {deliveryCharge}
+                      {getDeliveryCharges()}
                     </TableCell>
                   </TableRow>
+                  {Number(getUserTotalToPayonDelivery()) !== 0 && (
+                    <TableRow className=" hover:bg-neutral-900">
+                      <TableHead>Payable at delivery time</TableHead>
+                      <TableCell className="text-right w-52  text-base">
+                        {getUserTotalToPayonDelivery()}
+                      </TableCell>
+                    </TableRow>
+                  )}
                   {appliedCoupon && (
                     <TableRow className="   hover:bg-neutral-900">
                       <TableHead>Discount Applied ({appliedCoupon})</TableHead>
                       <TableCell className="text-right w-52  text-base">
-                        - ₹ {(cartTotal - discountedTotal).toFixed(2)}
+                        - ₹ {getDiscountedTotal()}
                       </TableCell>
                     </TableRow>
                   )}
@@ -492,14 +560,14 @@ const Page = () => {
                     <TableRow className="   hover:bg-neutral-900">
                       <TableHead>Gift Wrap</TableHead>
                       <TableCell className="text-right w-52  text-base">
-                        ₹ 40
+                        ₹ {getGiftWrapCharges()}
                       </TableCell>
                     </TableRow>
                   )}
                   <TableRow className=" hover:bg-neutral-900">
                     <TableHead>Total</TableHead>
                     <TableCell className="text-right w-52 text-xl">
-                      ₹ {finalTotal}
+                      ₹ {getUserTotalToPay()}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -517,7 +585,7 @@ export default Page;
 const inputClassName =
   "mb-4 w-full rounded-lg border border-gray-500 bg-transparent px-4 py-2 text-white focus:outline-none";
 
-const coupons = [
+const COUPONS = [
   { code: "GET5", discountPercent: 5, minAmount: 1000 },
   { code: "GET10", discountPercent: 10, minAmount: 1500 },
 ];
@@ -527,4 +595,5 @@ const cod_charge = {
   extraFees: 30,
 };
 
-const delivery_free_above = 1199;
+const MINIMUM_AMOUNT_FOR_FREE_DELIVERY = 1199;
+const DELIVERY_CHARGES = 60;

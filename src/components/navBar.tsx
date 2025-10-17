@@ -1,19 +1,10 @@
 "use client";
-import { cartState } from "@/const/cartState";
-import {
-  ChevronDown,
-  ChevronUp,
-  Menu,
-  Search,
-  ShoppingBag,
-  X,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useRecoilState } from "recoil";
 import { CartSheet } from "./cartSheet";
 
-const NavBar = () => {
+const NavBar = ({ offCart = false }: { offCart?: boolean }) => {
   const [mobNavOpen, setMobNavOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
 
@@ -90,9 +81,11 @@ const NavBar = () => {
                 <Search />
               </Link>
             </li>
-            <li className="flex cursor-pointer items-center justify-center px-2 py-1.5 text-sm duration-300 hover:bg-neutral-800 md:px-3 md:text-base">
-              <CartButton />
-            </li>
+            {!offCart && (
+              <li className="flex cursor-pointer items-center justify-center px-2 py-1.5 text-sm duration-300 hover:bg-neutral-800 md:px-3 md:text-base">
+                <CartButton />
+              </li>
+            )}
           </ul>
         </div>
 
@@ -104,7 +97,7 @@ const NavBar = () => {
           >
             <Search color="#ccc" />
           </Link>
-          <CartButton />
+          {!offCart && <CartButton />}
           {mobNavOpen ? (
             <X onClick={() => setMobNavOpen(false)} color="#ccc" />
           ) : (

@@ -1,14 +1,21 @@
-import connect from '@/dbConfig/dbConfig';
-import OrderModel from '@/Models/orderModel';
-import Product from '@/Models/productModel';
-import { NextRequest } from 'next/server';
+import connect from "@/dbConfig/dbConfig";
+import OrderModel from "@/Models/orderModel";
+import Product from "@/Models/productModel";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   await connect();
 
   const body = await request.json();
-  const { user, items, isCOD, total, isGiftWrap, couponApplied, couponInput } =
-    body;
+  const {
+    user,
+    items,
+    isCOD,
+    totalAmount: total,
+    isGiftWrap,
+    couponApplied,
+    couponInput,
+  } = body;
 
   let serverTotal = 0;
   let orderData = [];
@@ -47,7 +54,7 @@ export async function POST(request: NextRequest) {
   let serverDiscountedPrice = serverTotal;
 
   if (serverTotal > 2000) {
-    if (couponApplied && couponInput === 'AAY10') {
+    if (couponApplied && couponInput === "AAY10") {
       serverDiscountedPrice = serverTotal - serverTotal / 10;
     }
   } else {
@@ -67,7 +74,7 @@ export async function POST(request: NextRequest) {
   }
 
   const phishingActivity =
-    serverDiscountedPrice.toFixed(0) === total.toFixed(0) ? 'no' : 'yes';
+    serverDiscountedPrice.toFixed(0) === total.toFixed(0) ? "no" : "yes";
 
   try {
     await OrderModel.create({
@@ -82,7 +89,7 @@ export async function POST(request: NextRequest) {
       extraCharge: extraCharge.toFixed(0).toString(),
       discountedPrice: serverDiscountedPrice.toFixed(0).toString(),
       totalAmount: serverTotal.toFixed(0).toString(),
-      status: 'pending',
+      status: "pending",
       phishingActivity: phishingActivity,
       isGiftWrap: isGiftWrap,
       isCOD: isCOD,
@@ -91,14 +98,14 @@ export async function POST(request: NextRequest) {
       paymentStatus: body.paymentStatus,
     });
   } catch (error) {
-    console.error('Error placing order:', error);
-    return new Response(JSON.stringify({ message: 'Error placing order' }), {
+    console.error("Error placing order:", error);
+    return new Response(JSON.stringify({ message: "Error placing order" }), {
       status: 500,
     });
   }
 
   return new Response(
-    JSON.stringify({ message: 'Order placed successfully' }),
+    JSON.stringify({ message: "Order placed successfully" }),
     { status: 200 }
   );
 }
